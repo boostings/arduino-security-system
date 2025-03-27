@@ -1,0 +1,373 @@
+/* Dark mode variables */
+:root {
+  --dark-bg: #121212;
+  --dark-surface: #1e1e1e;
+  --dark-surface-2: #2d2d2d;
+  --dark-text: #e0e0e0;
+  --dark-text-secondary: #a0a0a0;
+  --dark-border: #333;
+  --dark-accent: #4285f4;
+  --success-color: #4CAF50;
+  --error-color: #F44336;
+  --warning-color: #FF9800;
+}
+
+/* Global styles for the component */
+.teachable-machine-container {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.teachable-machine-container h2 {
+  color: var(--dark-text);
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--dark-border);
+  padding-bottom: 15px;
+}
+
+/* Layout for side-by-side arrangement */
+.recognition-interface {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.webcam-section {
+  flex: 1;
+  min-width: 320px;
+}
+
+.webcam-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--dark-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.webcam-element {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.prediction-canvas {
+  display: none; /* Hide the canvas as it's used for processing */
+}
+
+/* Camera placeholder when webcam is not active */
+.camera-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  min-height: 320px;
+  background-color: var(--dark-surface);
+  border-radius: 10px;
+  border: 1px dashed var(--dark-border);
+  text-align: center;
+}
+
+.camera-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.status-message {
+  color: var(--dark-text-secondary);
+  margin-bottom: 15px;
+}
+
+.status-log {
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--dark-surface-2);
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 15px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.status-log h3 {
+  margin-top: 0;
+  font-size: 14px;
+  color: var(--dark-text-secondary);
+  margin-bottom: 10px;
+}
+
+.status-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-message {
+  padding: 4px 0;
+  color: var(--dark-text-secondary);
+}
+
+.status-message.status-error {
+  color: var(--error-color);
+}
+
+.status-message.status-success {
+  color: var(--success-color);
+}
+
+.status-message.status-warning {
+  color: var(--warning-color);
+}
+
+.status-time {
+  opacity: 0.7;
+  margin-right: 6px;
+}
+
+.start-button {
+  background-color: var(--dark-accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.start-button:hover {
+  background-color: #5294ff;
+}
+
+/* Prediction Meter Styles - Dark Mode */
+.prediction-meter {
+  flex: 1;
+  min-width: 320px;
+  background-color: var(--dark-surface);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.meter-title {
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 18px;
+}
+
+.connection-status {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.connection-status.active {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.meter-bar {
+  height: 24px;
+  background-color: var(--dark-surface-2);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.meter-fill {
+  height: 100%;
+  transition: width 0.3s ease-in-out, background-color 0.3s;
+  border-radius: 12px;
+}
+
+.meter-fill.Jimmy {
+  background-color: var(--success-color);
+}
+
+.meter-fill.Blank {
+  background-color: var(--error-color);
+}
+
+/* Prediction results container */
+.prediction-results {
+  padding: 15px;
+  border-radius: 8px;
+  background-color: var(--dark-surface-2);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.prediction-text {
+  margin-bottom: 12px;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.prediction-text.primary {
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dark-border);
+  margin-bottom: 15px;
+}
+
+.prediction-label {
+  color: var(--dark-text-secondary);
+}
+
+.prediction-value {
+  font-weight: 600;
+  color: var(--dark-text);
+}
+
+.prediction-value.valid {
+  color: var(--success-color);
+}
+
+.prediction-value.invalid {
+  color: var(--error-color);
+}
+
+/* All predictions section */
+.all-predictions {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--dark-border);
+  flex-grow: 1;
+}
+
+.all-predictions h4 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: var(--dark-text-secondary);
+  font-weight: 500;
+}
+
+.label-prediction {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.label-name {
+  width: 100px;
+  font-size: 13px;
+  color: var(--dark-text);
+}
+
+.label-bar-container {
+  flex-grow: 1;
+  height: 8px;
+  background-color: var(--dark-surface);
+  border-radius: 4px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.label-bar {
+  height: 100%;
+  transition: width 0.3s;
+}
+
+.label-percentage {
+  width: 50px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--dark-text-secondary);
+}
+
+/* Face status indicator */
+.face-status {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--dark-border);
+}
+
+.status {
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status.valid-face {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status.invalid-face {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #e57373;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.status.uncertain {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #ffb74d;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+/* No prediction state */
+.no-prediction-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
+  color: var(--dark-text-secondary);
+  flex-grow: 1;
+}
+
+.loading-spinner {
+  margin-top: 20px;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(150, 150, 150, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--dark-accent);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .recognition-interface {
+    flex-direction: column;
+  }
+  
+  .webcam-section, .prediction-meter {
+    width: 100%;
+  }
+}

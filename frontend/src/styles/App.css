@@ -1,0 +1,212 @@
+/* Dark Mode App Styling */
+:root {
+  --dark-bg: #121212;
+  --dark-surface: #1e1e1e;
+  --dark-surface-2: #2d2d2d;
+  --dark-text: #e0e0e0;
+  --dark-text-secondary: #a0a0a0;
+  --dark-border: #333;
+  --dark-accent: #4285f4;
+  --success-color: #4CAF50;
+  --error-color: #F44336;
+  --warning-color: #FF9800;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #000000;
+  color: var(--dark-text);
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  margin-bottom: 30px;
+  text-align: center;
+  padding: 20px 0;
+  border-radius: 10px;
+  background-color: var(--dark-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--dark-text);
+  letter-spacing: 0.5px;
+}
+
+/* Status Panel */
+.status-panel {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: var(--dark-surface);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-label {
+  font-size: 14px;
+  color: var(--dark-text-secondary);
+  margin-bottom: 5px;
+}
+
+.status-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.status-connected {
+  color: var(--success-color);
+}
+
+.status-disconnected {
+  color: var(--error-color);
+}
+
+/* Log Panel */
+.log-panel {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--dark-surface);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.log-panel h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: var(--dark-text);
+  border-bottom: 1px solid var(--dark-border);
+  padding-bottom: 10px;
+}
+
+.log-entries {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 5px;
+  background-color: var(--dark-surface-2);
+  padding: 10px;
+}
+
+.log-entry {
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.log-entry .timestamp {
+  font-size: 11px;
+  color: var(--dark-text-secondary);
+  margin-right: 10px;
+}
+
+.log-entry.info {
+  border-left: 3px solid var(--dark-accent);
+}
+
+.log-entry.success {
+  border-left: 3px solid var(--success-color);
+}
+
+.log-entry.error {
+  border-left: 3px solid var(--error-color);
+}
+
+.log-entry.warning {
+  border-left: 3px solid var(--warning-color);
+}
+
+/* Control Panel */
+.control-panel {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--dark-surface);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-panel h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: var(--dark-text);
+  border-bottom: 1px solid var(--dark-border);
+  padding-bottom: 10px;
+}
+
+.control-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.control-button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--dark-accent);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.control-button:hover {
+  background-color: #5294ff;
+}
+
+.control-button.danger {
+  background-color: var(--error-color);
+}
+
+.control-button.danger:hover {
+  background-color: #ff6659;
+}
+
+.control-button:disabled {
+  background-color: var(--dark-border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app {
+    padding: 10px;
+  }
+  
+  header {
+    padding: 15px 0;
+  }
+  
+  header h1 {
+    font-size: 24px;
+  }
+  
+  .status-panel {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+}
