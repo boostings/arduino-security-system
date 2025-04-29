@@ -28,6 +28,9 @@ const io = socketIo(server, {
 // Arduino connection
 let arduinoPort = null;
 let isArduinoConnected = false;
+let lastCommandTime = 0;
+let lastCommand = '';
+const COMMAND_COOLDOWN = 2000; // 2 seconds between same commands
 
 // API endpoints
 app.get('/api/status', (req, res) => {
@@ -52,7 +55,7 @@ io.on('connection', (socket) => {
   // Handle commands from client
   socket.on('command', (data) => {
     if (data.command) {
-      sendToArduino(data.command);
+      sendToArduino(data.command, data.user);
     }
   });
 
@@ -63,58 +66,49 @@ io.on('connection', (socket) => {
 
 // Initialize Arduino connection
 function initializeArduino() {
-  // List available ports
+  // List available ports for logging purposes
   SerialPort.list().then(ports => {
     console.log('Available ports:', ports);
     
-    // Find Arduino port (usually contains 'Arduino' or 'CH340' in the description)
-    const arduinoPortInfo = ports.find(port => 
-      port.manufacturer?.toLowerCase().includes('arduino') ||
-      port.manufacturer?.toLowerCase().includes('ch340')
-    );
+    // Use specified port for your Arduino
+    const arduinoPath = '/dev/tty.usbserial-10';
+    console.log('Attempting to connect to Arduino on port:', arduinoPath);
+    
+    // Create new SerialPort instance
+    arduinoPort = new SerialPort({
+      path: arduinoPath,
+      baudRate: 115200
+    });
 
-    if (arduinoPortInfo) {
-      console.log('Found Arduino on port:', arduinoPortInfo.path);
-      
-      // Create new SerialPort instance
-      arduinoPort = new SerialPort({
-        path: arduinoPortInfo.path,
-        baudRate: 9600
-      });
+    // Create parser
+    const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
 
-      // Create parser
-      const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
+    // Handle data from Arduino
+    parser.on('data', (data) => {
+      console.log('Arduino:', data);
+      io.emit('arduinoData', { message: data });
+    });
 
-      // Handle data from Arduino
-      parser.on('data', (data) => {
-        console.log('Arduino:', data);
-        io.emit('arduinoData', { message: data });
-      });
+    // Handle Arduino connection
+    arduinoPort.on('open', () => {
+      console.log('Arduino connected successfully');
+      isArduinoConnected = true;
+      io.emit('arduinoStatus', { connected: true });
+    });
 
-      // Handle Arduino connection
-      arduinoPort.on('open', () => {
-        console.log('Arduino connected');
-        isArduinoConnected = true;
-        io.emit('arduinoStatus', { connected: true });
-      });
+    // Handle Arduino disconnection
+    arduinoPort.on('close', () => {
+      console.log('Arduino disconnected');
+      isArduinoConnected = false;
+      io.emit('arduinoStatus', { connected: false });
+    });
 
-      // Handle Arduino disconnection
-      arduinoPort.on('close', () => {
-        console.log('Arduino disconnected');
-        isArduinoConnected = false;
-        io.emit('arduinoStatus', { connected: false });
-      });
-
-      // Handle errors
-      arduinoPort.on('error', (err) => {
-        console.error('Arduino error:', err);
-        isArduinoConnected = false;
-        io.emit('arduinoStatus', { connected: false, error: err.message });
-      });
-    } else {
-      console.log('No Arduino found');
-      io.emit('arduinoStatus', { connected: false, error: 'No Arduino found' });
-    }
+    // Handle errors
+    arduinoPort.on('error', (err) => {
+      console.error('Arduino error:', err);
+      isArduinoConnected = false;
+      io.emit('arduinoStatus', { connected: false, error: err.message });
+    });
   }).catch(err => {
     console.error('Error listing ports:', err);
     io.emit('arduinoStatus', { connected: false, error: err.message });
@@ -122,11 +116,26 @@ function initializeArduino() {
 }
 
 // Send command to Arduino
-function sendToArduino(command) {
+function sendToArduino(command, user) {
   if (arduinoPort && isArduinoConnected) {
-    arduinoPort.write(command + '\n', (err) => {
+    // If the command includes user information, add it to the command string
+    const commandToSend = user ? `${command}:${user}` : command;
+    const currentTime = Date.now();
+    
+    // Debounce same commands to prevent flooding the Arduino
+    if (commandToSend === lastCommand && currentTime - lastCommandTime < COMMAND_COOLDOWN) {
+      console.log(`Command "${commandToSend}" ignored (sent too recently)`);
+      return;
+    }
+    
+    console.log(`Sending command to Arduino: ${commandToSend}`);
+    arduinoPort.write(commandToSend + '\n', (err) => {
       if (err) {
         console.error('Error sending command to Arduino:', err);
+      } else {
+        // Update last command info
+        lastCommand = commandToSend;
+        lastCommandTime = currentTime;
       }
     });
   } else {

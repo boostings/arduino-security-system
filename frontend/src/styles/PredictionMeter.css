@@ -204,11 +204,16 @@
   border-radius: 12px;
 }
 
-.meter-fill.Jimmy {
+/* Updated styles for meter fill based on authorized users */
+.meter-fill.Jimmy,
+.meter-fill.Jackson,
+.meter-fill.Sofia,
+.meter-fill.Chris {
   background-color: var(--success-color);
 }
 
-.meter-fill.Blank {
+.meter-fill.Blank,
+.meter-fill.\Blank\ Wall\/Unknown\ Person {
   background-color: var(--error-color);
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 
@@ -17,6 +17,13 @@ function App() {
     activeConnections: 0
   });
   const [logs, setLogs] = useState([]);
+  
+  // Ref to track the last command sent and its timeout
+  const lastCommandRef = useRef({ command: null, user: null, timeoutId: null });
+  const commandCooldownMs = 5000; // Only send the same command every 5 seconds
+  
+  // List of authorized individuals (wrapped in useMemo to prevent recreation on every render)
+  const authorizedUsers = useMemo(() => ['Jimmy', 'Jackson', 'Sofia', 'Chris'], []);
   
   // Add log entry
   const addLog = useCallback((message, type = 'info') => {
@@ -41,17 +48,55 @@ function App() {
   
   // Handle Teachable Machine predictions
   const handlePrediction = useCallback((prediction) => {
-    if (socket) {
-      // Assuming your model has classes "valid" and "invalid"
-      if (prediction.className === "valid" && prediction.probability > 0.8) {
-        socket.emit('command', { command: 'VALID_FACE' });
-        addLog(`Valid face detected with confidence: ${(prediction.probability * 100).toFixed(2)}%`, 'success');
-      } else if (prediction.className === "invalid" && prediction.probability > 0.8) {
-        socket.emit('command', { command: 'INVALID_FACE' });
-        addLog(`Invalid face detected with confidence: ${(prediction.probability * 100).toFixed(2)}%`, 'error');
-      }
+    if (!socket || prediction.probability <= 0.8) {
+      // If socket is not ready or confidence is too low, do nothing
+      return;
     }
-  }, [socket, addLog]);
+  
+    let commandToSend = null;
+    let userToSend = null;
+    let logMessage = null;
+    let logType = 'info';
+  
+    // Determine command based on prediction
+    if (authorizedUsers.includes(prediction.className)) {
+      commandToSend = 'VALID_FACE';
+      userToSend = prediction.className;
+      logMessage = `Authorized user detected: ${prediction.className} with confidence: ${(prediction.probability * 100).toFixed(2)}%`;
+      logType = 'success';
+    } else {
+      commandToSend = 'INVALID_FACE';
+      logMessage = `Unauthorized person detected with confidence: ${(prediction.probability * 100).toFixed(2)}%`;
+      logType = 'error';
+    }
+  
+    // Check if the command is different from the last one or if cooldown expired
+    const now = Date.now();
+    const lastCommand = lastCommandRef.current;
+  
+    // Clear any existing timeout if the command changes
+    if (lastCommand.timeoutId && (lastCommand.command !== commandToSend || lastCommand.user !== userToSend)) {
+      clearTimeout(lastCommand.timeoutId);
+      lastCommandRef.current.timeoutId = null;
+    }
+  
+    // Send command only if it's different or cooldown passed, and no timeout is pending
+    if ((lastCommand.command !== commandToSend || lastCommand.user !== userToSend || !lastCommand.timeoutId)) {
+      
+      // Send the command
+      socket.emit('command', { command: commandToSend, user: userToSend });
+      addLog(logMessage, logType);
+  
+      // Set a timeout to prevent sending the same command again too soon
+      const timeoutId = setTimeout(() => {
+          lastCommandRef.current.timeoutId = null; // Clear timeoutId when it expires
+      }, commandCooldownMs);
+      
+      // Update the ref with the latest command and timeout
+      lastCommandRef.current = { command: commandToSend, user: userToSend, timeoutId: timeoutId };
+    }
+  
+  }, [socket, addLog, authorizedUsers, commandCooldownMs]);
 
   // Fetch system status from API
   const fetchStatus = useCallback(async () => {

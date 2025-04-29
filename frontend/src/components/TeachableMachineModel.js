@@ -21,8 +21,10 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
   const isMacOS = /Mac/.test(navigator.platform);
   const loopFuncRef = useRef(null);
   const startWebcamFuncRef = useRef(null);
-  // Fixed labels from metadata instead of trying to get them from model
-  const modelLabels = ['Jimmy', 'Blank Wall'];
+  // Updated labels from metadata
+  const modelLabels = ['Jimmy', 'Jackson', 'Sofia', 'Chris', 'Blank Wall/Unknown Person'];
+  // List of authorized individuals
+  const authorizedUsers = ['Jimmy', 'Jackson', 'Sofia', 'Chris'];
 
   // Add a log message to display in the UI
   const addStatusMessage = useCallback((message, type = 'info') => {
@@ -513,7 +515,7 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
               className={`meter-fill ${currentPrediction?.className || ''}`}
               style={{ 
                 width: currentPrediction ? `${currentPrediction.probability * 100}%` : '0%',
-                backgroundColor: currentPrediction?.className === 'Jimmy' ? '#4CAF50' : '#F44336'
+                backgroundColor: authorizedUsers.includes(currentPrediction?.className) ? '#4CAF50' : '#F44336'
               }}
             />
           </div>
@@ -522,8 +524,10 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
             <div className="prediction-results">
               <div className="prediction-text primary">
                 <span className="prediction-label">Face Recognition:</span> 
-                <span className={`prediction-value ${currentPrediction.className === 'Jimmy' ? 'valid' : 'invalid'}`}>
-                  {currentPrediction.className === 'Jimmy' ? 'Valid Person (Jimmy)' : 'Unrecognized Face'}
+                <span className={`prediction-value ${authorizedUsers.includes(currentPrediction.className) ? 'valid' : 'invalid'}`}>
+                  {authorizedUsers.includes(currentPrediction.className) 
+                    ? `Valid Person (${currentPrediction.className})` 
+                    : 'Unauthorized Person'}
                 </span>
               </div>
               
@@ -532,7 +536,7 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
                 <span className="prediction-value">{(currentPrediction.probability * 100).toFixed(2)}%</span>
               </div>
               
-              {/* Display all available predictions/labels from static list */}
+              {/* Display all available predictions/labels from updated list */}
               <div className="all-predictions">
                 <h4>All Predictions:</h4>
                 {modelLabels.map((label) => {
@@ -556,7 +560,7 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
                           className="label-bar" 
                           style={{
                             width: `${probability * 100}%`,
-                            backgroundColor: label === 'Jimmy' ? '#4CAF50' : '#F44336'
+                            backgroundColor: authorizedUsers.includes(label) ? '#4CAF50' : '#F44336'
                           }}
                         />
                       </div>
@@ -568,10 +572,10 @@ const TeachableMachineModel = ({ onPrediction, onModelLoad }) => {
               
               <div className="face-status">
                 {currentPrediction.probability > 0.8 ? (
-                  currentPrediction.className === 'Jimmy' ? (
-                    <div className="status valid-face">✅ Valid Face Detected</div>
+                  authorizedUsers.includes(currentPrediction.className) ? (
+                    <div className="status valid-face">✅ Authorized User: {currentPrediction.className}</div>
                   ) : (
-                    <div className="status invalid-face">❌ Invalid Face Detected</div>
+                    <div className="status invalid-face">❌ Unauthorized Person Detected</div>
                   )
                 ) : (
                   <div className="status uncertain">⚠️ Low Confidence Detection</div>
